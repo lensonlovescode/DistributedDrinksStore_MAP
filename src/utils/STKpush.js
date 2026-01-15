@@ -4,19 +4,23 @@ import redisClient from "../services/redis.js";
 
 async function STKpush(passkey, phonenumber, BusinessShortCode, AccessToken) {
   const Timestamp = moment().format("YYYYMMDDHHmmss");
-  const payload = JSON.stringify({
-    "Password": `${new Buffer.from(`${BusinessShortCode}${passkey}${Timestamp}`, 'utf8').toString('base64')}`,
+  console.log(`Using Timestamp: ${Timestamp} as type ${typeof(Timestamp)}`)
+  console.log(`Using BusinessShortCode: ${BusinessShortCode} as type ${typeof(BusinessShortCode)}`)
+  console.log(`Using Phone Number: ${phonenumber} as type ${typeof(phonenumber)}`)
+  console.log
+  const payload = {
     "BusinessShortCode": BusinessShortCode,
+    "Password": `${new Buffer.from(`${BusinessShortCode}${passkey}${Timestamp}`, 'utf8').toString('base64')}`,
     "Timestamp": Timestamp,
-    "Amount": "1",
-    "PartyA": phonenumber,
-    "PartyB": "174379",
     "TransactionType": "CustomerPayBillOnline",
+    "Amount": 1,
+    "PartyA": phonenumber,
+    "PartyB": BusinessShortCode,
     "PhoneNumber": phonenumber,
-    "TransactionDesc": "Test",
+    "CallBackURL": "https://lensonmutugi.tech/mpesa-express-simulate-callback/",
     "AccountReference": "Test",
-    "CallBackURL": "https://lensonmutugi.tech/mpesa-express-simulate-callback/"
-  });
+    "TransactionDesc": "Test"
+  };
 
   fetch("https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest", {
     method: "POST",
@@ -28,8 +32,11 @@ async function STKpush(passkey, phonenumber, BusinessShortCode, AccessToken) {
   })
   .then((response) => response.json())
   .then((data) => {
-    console.log(`Error is here: ${data}`)
-    console.log(data)
+    if (data.errorMessage) {
+      return ({ "error": errorMessage })
+    } else {
+      // Continue from here
+    }
   })
   .catch((error) => {
     console.log(`Got an Error from STK Push: ${error}`);

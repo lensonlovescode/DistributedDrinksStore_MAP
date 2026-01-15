@@ -5,7 +5,7 @@ import RedisClient from "../services/redis.js";
 
 class MpesaController {
   static async MpesaMainPush(req, res) {
-    const PhoneNumber = req.body.phoneNumber;
+    const PhoneNumber = req.body.phone;
 
     let AccessToken = await RedisClient.get("AccessToken");
     console.log(`AccessToken From Redis is: ${AccessToken}`);
@@ -13,8 +13,7 @@ class MpesaController {
       console.log(`Getting new AccessToken`)
       AccessToken = await GetAccessToken();
     }
-    console.log(`Using passey: ${process.env.PASSKEY}`)
-    STKpush(process.env.PASSKEY, PhoneNumber, 4224044, AccessToken)
+    STKpush(process.env.PASSKEY, Number(PhoneNumber), 174379, AccessToken)
   }
 }
 
