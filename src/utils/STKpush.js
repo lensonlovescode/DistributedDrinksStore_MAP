@@ -22,7 +22,7 @@ async function STKpush(passkey, phonenumber, BusinessShortCode, AccessToken) {
     "TransactionDesc": "Test"
   };
 
-  fetch("https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest", {
+  return fetch("https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -33,14 +33,15 @@ async function STKpush(passkey, phonenumber, BusinessShortCode, AccessToken) {
   .then((response) => response.json())
   .then((data) => {
     if (data.errorMessage) {
-      return ({ "error": errorMessage })
+      return ({ "error": data.errorMessage })
     } else {
       // Continue from here
+      return data;
     }
   })
   .catch((error) => {
     console.log(`Got an Error from STK Push: ${error}`);
-    console.error
+    return { error: error.message };
   });
 }
 
