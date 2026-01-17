@@ -1,0 +1,31 @@
+{
+  "name": "distributed-drinks-store",
+  "version": "1.0.0",
+  "description": "A distributed drinks store management system with multiple branches, inventory tracking, and M-Pesa payment integration",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "keywords": [
+    "drinks",
+    "store",
+    "ecommerce",
+    "mpesa",
+    "inventory"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "mongoose": "^8.0.3",
+    "moment": "^2.29.4",
+    "redis": "^4.6.12"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
