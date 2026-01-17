@@ -1,5 +1,5 @@
 import moment from "moment";
-import redisClient from "../services/redis.js";
+//import redisClient from "../services/redis.js";
 
 
 async function STKpush(passkey, phonenumber, BusinessShortCode, AccessToken) {

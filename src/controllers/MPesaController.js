@@ -1,6 +1,6 @@
 import STKpush from "../utils/STKpush.js"
 import GetAccessToken from "../utils/GetAccessToken.js"; 
-import RedisClient from "../services/redis.js";
+//import RedisClient from "../services/redis.js";
 
 
 class MpesaController {

@@ -1,4 +1,3 @@
-import redisClient from "../services/redis.js";
 
 function GetAccessToken() {
   fetch("https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials", {

@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 class Database {
   constructor() {
@@ -7,18 +7,20 @@ class Database {
 
   async connect() {
     try {
-      const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/distributed_drinks_store';
-      
-      await mongoose.connect(mongoURI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      });
+      const mongoURI =
+        process.env.MONGODB_URI || "mongodb://localhost:27017/distributed_drinks_store";
+
+      if (!mongoURI) {
+        throw new Error("MONGODB_URI is not defined");
+      }
+
+      await mongoose.connect(mongoURI);
 
       this.connected = true;
-      console.log('Database connected successfully');
+      console.log("Database connected successfully");
       return true;
     } catch (error) {
-      console.error('Database connection error:', error.message);
+      console.error("Database connection error:", error.message);
       this.connected = false;
       throw error;
     }
@@ -28,9 +30,9 @@ class Database {
     try {
       await mongoose.disconnect();
       this.connected = false;
-      console.log('Database disconnected');
+      console.log("Database disconnected");
     } catch (error) {
-      console.error('Error disconnecting database:', error.message);
+      console.error("Error disconnecting database:", error.message);
       throw error;
     }
   }
