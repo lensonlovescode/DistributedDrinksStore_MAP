@@ -15,7 +15,7 @@ async function STKpush(passkey, phonenumber, BusinessShortCode, AccessToken) {
     "PartyB": BusinessShortCode,
     "PhoneNumber": phonenumber,
     "CallBackURL": "https://lensonmutugi.tech/mpesa-express-simulate-callback/",
-    "AccountReference": "Weka pin mbio mbio !",
+    "AccountReference": "Hey Grace",
     "TransactionDesc": "Test"
   };
 

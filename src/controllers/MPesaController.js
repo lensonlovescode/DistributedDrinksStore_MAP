@@ -16,10 +16,10 @@ class MpesaController {
     }
     const data = await STKpush(process.env.PASSKEY, Number(PhoneNumber), 174379, AccessToken);
     if (data.error) {
-      res.status(500).json({ "erorr": data.error, "message": data.message, "OrderNumber": OrderNumber })
+      res.status(500).json({ "erorr": data.error, "message": data.message, "OrderNumber": OrderNumber }) // Add "OrderNumber": OrderNumber as param 
     } else {
-      // (order) add order to database here with all details and paid - no but and with checkoutRequestID
-      res.status(200).json({ "status": data.CustomerMessage, "CheckoutRequestID": data.CheckoutRequestID, "OrderNumber": OrderNumber })
+      // (order) add order to database here with all details and paid - no but and with checkoutRequestID mark paid = no
+      res.status(200).json({ "status": data.CustomerMessage, "CheckoutRequestID": data.CheckoutRequestID })
     }
   }
 }
