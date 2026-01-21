@@ -1,39 +1,30 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-class Database {
+class DBClient {
   constructor() {
     this.connected = false;
   }
 
   async connect() {
     try {
-      const mongoURI =
-        process.env.MONGODB_URI || "mongodb://localhost:27017/distributed_drinks_store";
+      if (this.connected) return;
 
-      if (!mongoURI) {
-        throw new Error("MONGODB_URI is not defined");
-      }
-
-      await mongoose.connect(mongoURI);
-
+      const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/distributed_drinks_store';
+      
+      await mongoose.connect(mongoUri);
       this.connected = true;
-      console.log("Database connected successfully");
-      return true;
+      console.log('✅ MongoDB Connected');
     } catch (error) {
-      console.error("Database connection error:", error.message);
-      this.connected = false;
+      console.error('❌ MongoDB Connection Error:', error.message);
       throw error;
     }
   }
 
   async disconnect() {
-    try {
+    if (this.connected) {
       await mongoose.disconnect();
       this.connected = false;
-      console.log("Database disconnected");
-    } catch (error) {
-      console.error("Error disconnecting database:", error.message);
-      throw error;
+      console.log('✅ MongoDB Disconnected');
     }
   }
 
@@ -42,4 +33,4 @@ class Database {
   }
 }
 
-export default new Database();
+export default new DBClient();

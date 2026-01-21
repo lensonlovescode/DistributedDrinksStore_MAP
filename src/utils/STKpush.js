@@ -3,11 +3,8 @@ import moment from "moment";
 
 
 async function STKpush(passkey, phonenumber, BusinessShortCode, AccessToken) {
+
   const Timestamp = moment().format("YYYYMMDDHHmmss");
-  console.log(`Using Timestamp: ${Timestamp} as type ${typeof(Timestamp)}`)
-  console.log(`Using BusinessShortCode: ${BusinessShortCode} as type ${typeof(BusinessShortCode)}`)
-  console.log(`Using Phone Number: ${phonenumber} as type ${typeof(phonenumber)}`)
-  console.log
   const payload = {
     "BusinessShortCode": BusinessShortCode,
     "Password": `${new Buffer.from(`${BusinessShortCode}${passkey}${Timestamp}`, 'utf8').toString('base64')}`,
@@ -33,14 +30,14 @@ async function STKpush(passkey, phonenumber, BusinessShortCode, AccessToken) {
   .then((response) => response.json())
   .then((data) => {
     if (data.errorMessage) {
-      return ({ "error": data.errorMessage })
+      return ({ "error": "Internal Error Server", "Message": errorMessage })
     } else {
-      // Continue from here
-      return data;
+      console.log(data);
+      return (data) 
     }
   })
   .catch((error) => {
-    console.log(`Got an Error from STK Push: ${error}`);
+    console.log(`Unable to perform STK Push: ${error}`);
     return { error: error.message };
   });
 }
