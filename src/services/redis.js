@@ -33,6 +33,16 @@ class redisClient {
             return false
         }
     }
+
+    async del(key) {
+        try {
+            await this.client.del(key)
+            return true
+        } catch (error) {
+            console.error('Error deleting key: ', error)
+            return false
+        }
+    }
 }
 
 export default new redisClient()
