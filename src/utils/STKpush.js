@@ -30,7 +30,7 @@ async function STKpush(passkey, phonenumber, BusinessShortCode, AccessToken, amo
   .then((response) => response.json())
   .then((data) => {
     if (data.errorMessage) {
-      return ({ "error": "Internal Error Server", "Message": errorMessage })
+      return ({ "error": "Internal Error Server", "Message": data.errorMessage })
     } else {
       console.log(data);
       return (data) 

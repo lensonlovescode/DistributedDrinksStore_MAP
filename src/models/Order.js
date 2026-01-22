@@ -2,7 +2,8 @@ import mongoose from 'mongoose';
 
 const OrderSchema = new mongoose.Schema({
   drink: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Product',
     required: true,
   },
   quantity: {
@@ -14,7 +15,8 @@ const OrderSchema = new mongoose.Schema({
     required: true,
   },
   branch: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Branch',
     required: true,
   },
   paid: {
