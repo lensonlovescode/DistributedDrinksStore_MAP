@@ -1,123 +1,23 @@
 import express from "express";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import Customer from "../models/Customer.js";
+import User from "../models/User.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
 /**
  * ============================
- * CUSTOMER SIGNUP (PUBLIC)
- * ============================
- */
-router.post("/signup", async (req, res) => {
-  try {
-    let { name, username, email, password } = req.body;
-
-    if (!name || !username || !email || !password) {
-      return res.status(400).json({ error: "All fields are required" });
-    }
-
-    email = email.toLowerCase();
-
-    const existingCustomer = await Customer.findOne({ email });
-    if (existingCustomer) {
-      return res.status(400).json({ error: "Email already exists" });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const customer = new Customer({
-      name,
-      username,
-      email,
-      password: hashedPassword,
-    });
-
-    await customer.save();
-
-    res.status(201).json({
-      message: "Customer created successfully",
-      customer: {
-        id: customer._id,
-        name: customer.name,
-        username: customer.username,
-        email: customer.email,
-      },
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-/**
- * ============================
- * CUSTOMER LOGIN (PUBLIC)
- * ============================
- */
-router.post("/login", async (req, res) => {
-  try {
-    let { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ error: "Email and password are required" });
-    }
-
-    if (!process.env.JWT_SECRET) {
-      return res.status(500).json({ error: "JWT configuration missing" });
-    }
-
-    email = email.toLowerCase();
-
-    const customer = await Customer.findOne({ email });
-    if (!customer) {
-      return res.status(401).json({ error: "Invalid email or password" });
-    }
-
-    const isMatch = await bcrypt.compare(password, customer.password);
-    if (!isMatch) {
-      return res.status(401).json({ error: "Invalid email or password" });
-    }
-
-    const token = jwt.sign(
-      { id: customer._id },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || "1d" }
-    );
-
-    res.status(200).json({
-      message: "Login successful",
-      token,
-      customer: {
-        id: customer._id,
-        name: customer.name,
-        username: customer.username,
-        email: customer.email,
-      },
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-/**
- * ============================
- * GET LOGGED-IN CUSTOMER
+ * GET LOGGED-IN USER
  * ============================
  */
 router.get("/me", authMiddleware, async (req, res) => {
   try {
-    if (!req.user?.id) {
-      return res.status(401).json({ error: "Unauthorized" });
+    const user = await User.findById(req.user.id).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
     }
 
-    const customer = await Customer.findById(req.user.id).select("-password");
-    if (!customer) {
-      return res.status(404).json({ error: "Customer not found" });
-    }
-
-    res.status(200).json(customer);
+    res.status(200).json(user);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -125,19 +25,17 @@ router.get("/me", authMiddleware, async (req, res) => {
 
 /**
  * ============================
- * UPDATE LOGGED-IN CUSTOMER
+ * UPDATE LOGGED-IN USER
  * ============================
  */
 router.patch("/me", authMiddleware, async (req, res) => {
   try {
-    if (!req.user?.id) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-
     const { name, username, email } = req.body;
 
     if (!name && !username && !email) {
-      return res.status(400).json({ error: "No data provided for update" });
+      return res.status(400).json({
+        error: "No data provided for update",
+      });
     }
 
     const updates = {};
@@ -145,19 +43,19 @@ router.patch("/me", authMiddleware, async (req, res) => {
     if (username) updates.username = username;
     if (email) updates.email = email.toLowerCase();
 
-    const customer = await Customer.findByIdAndUpdate(
+    const user = await User.findByIdAndUpdate(
       req.user.id,
       updates,
       { new: true }
     ).select("-password");
 
-    if (!customer) {
-      return res.status(404).json({ error: "Customer not found" });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
     }
 
     res.status(200).json({
-      message: "Customer updated successfully",
-      customer,
+      message: "Profile updated successfully",
+      user,
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -166,21 +64,20 @@ router.patch("/me", authMiddleware, async (req, res) => {
 
 /**
  * ============================
- * DELETE LOGGED-IN CUSTOMER
+ * DELETE LOGGED-IN USER
  * ============================
  */
 router.delete("/me", authMiddleware, async (req, res) => {
   try {
-    if (!req.user?.id) {
-      return res.status(401).json({ error: "Unauthorized" });
+    const user = await User.findByIdAndDelete(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
     }
 
-    const customer = await Customer.findByIdAndDelete(req.user.id);
-    if (!customer) {
-      return res.status(404).json({ error: "Customer not found" });
-    }
-
-    res.status(200).json({ message: "Customer deleted successfully" });
+    res.status(200).json({
+      message: "Account deleted successfully",
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
