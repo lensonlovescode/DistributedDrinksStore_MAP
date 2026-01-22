@@ -1,5 +1,6 @@
 import Order from "../models/Order.js";
 import Payment from "../models/transactions.js";
+import BranchStock from "../models/BranchStock.js";
 import asyncHandler from "express-async-handler";
 
 class CashOrderController {
@@ -88,10 +89,19 @@ class CashOrderController {
     order.paymentStatus = "completed";
     await order.save();
 
+    // Reduce stock when order is confirmed
+    for (const item of order.items) {
+      await BranchStock.findOneAndUpdate(
+        { branchId: order.branchId, productId: item.productId },
+        { $inc: { quantity: -item.quantity } },
+        { new: true }
+      );
+    }
+
     // Create payment record for cash transaction
     const payment = new Payment({
       orderId,
-      phoneNumber: "cash-payment", // Placeholder for cash transactions
+      phoneNumber: "0000000000", // Placeholder for cash transactions (10 digits to pass validation)
       amount: amountReceived,
       status: "completed",
       paymentMethod: "cash",

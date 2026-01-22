@@ -133,16 +133,10 @@ class MpesaCallbackController {
         });
       }
 
-      // Not found in Redis, try database
-      const payment = await Payment.findOne({ mpesaReceiptNumber: checkoutRequestID }).populate("orderId");
-      if (payment) {
-        return res.status(200).json({
-          status: payment.status,
-          message: `Payment is ${payment.status}`,
-          payment,
-          orderDetails: payment.orderId
-        });
-      }
+      // Not found in Redis, try database by searching for order with this checkoutRequestID
+      // Note: checkoutRequestID is stored in Redis, not in payment records
+      // If we need to search by mpesaReceiptNumber, we'd need a different identifier
+      // For now, return not found since checkoutRequestID is not stored in payment records
 
       return res.status(404).json({
         message: "Transaction not found"

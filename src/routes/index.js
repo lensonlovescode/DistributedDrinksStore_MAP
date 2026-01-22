@@ -1,6 +1,6 @@
 import express from "express";
 import MpesaController from "../controllers/MPesaController.js";
-import MPesaCallcackController from "../controllers/MPesaCallbackController.js";
+import MPesaCallbackController from "../controllers/MPesaCallbackController.js";
 import CashOrderController from "../controllers/CashOrderController.js";
 import OrderController from "../controllers/OrderController.js";
 import RestockingController from "../controllers/RestockingController.js";
@@ -12,10 +12,10 @@ const router = express.Router();
 router.post("/mpesapush", MpesaController.MpesaMainPush);
 
 // M-Pesa callback endpoint (called by Safaricom after customer enters PIN)
-router.post("/mpesa-express-simulate-callback", MPesaCallcackController.MpesaCallback);
+router.post("/mpesa-express-simulate-callback", MPesaCallbackController.MpesaCallback);
 
 // Check payment status using CheckoutRequestID
-router.get("/order-status/:checkoutRequestID", MPesaCallcackController.OrderStatus);
+router.get("/order-status/:checkoutRequestID", MPesaCallbackController.OrderStatus);
 
 // ===== ORDER MANAGEMENT ROUTES =====
 // Create a new order (called before payment)
