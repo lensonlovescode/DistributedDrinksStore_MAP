@@ -2,7 +2,7 @@ import moment from "moment";
 import redisClient from "../services/redis.js";
 
 
-async function STKpush(passkey, phonenumber, BusinessShortCode, AccessToken) {
+async function STKpush(passkey, phonenumber, BusinessShortCode, AccessToken, amount) {
 
   const Timestamp = moment().format("YYYYMMDDHHmmss");
   const payload = {
@@ -10,11 +10,11 @@ async function STKpush(passkey, phonenumber, BusinessShortCode, AccessToken) {
     "Password": `${new Buffer.from(`${BusinessShortCode}${passkey}${Timestamp}`, 'utf8').toString('base64')}`,
     "Timestamp": Timestamp,
     "TransactionType": "CustomerPayBillOnline",
-    "Amount": 1,
+    "Amount": amount,
     "PartyA": phonenumber,
     "PartyB": BusinessShortCode,
     "PhoneNumber": phonenumber,
-    "CallBackURL": "https://lensonmutugi.tech/mpesa-express-simulate-callback/",
+    "CallBackURL": "https://kasie-nongranular-darwin.ngrok-free.dev/mpesa-express-callback/",
     "AccountReference": "Test",
     "TransactionDesc": "Test"
   };

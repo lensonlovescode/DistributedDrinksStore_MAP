@@ -1,14 +1,21 @@
+import Order from '../models/Order.js';
+import RedisClient from '../services/redis.js';
+
 class MpesaCallbackController {
   static async MpesaCallback(req, res) {
     try {
       const callbackData = req.body;
       const result_code = callbackData.Body.stkCallback.ResultCode;
+      const checkoutRequestID = callbackData.Body.stkCallback.CheckoutRequestID;
 
       if (result_code !== 0) {
         const error_message = callbackData.Body.stkCallback.ResultDesc;
         console.log(`Payment failed: ${error_message}`);
-      	// (order) redis utility store: ie the transaction failed in the form CheckoutRequestID = { ResultCode: result_code, ResultDesc: error_message }
-        // (order) database utility store: remove the transaction with the CheckoutRequestID 
+        await RedisClient.set(
+          checkoutRequestID,
+          JSON.stringify({ ResultCode: result_code, ResultDesc: error_message, }),
+          300
+        );
         return res.json({ ResultCode: result_code, ResultDesc: error_message });
       }
 
@@ -16,11 +23,30 @@ class MpesaCallbackController {
       const amount = body.Item.find(obj => obj.Name === 'Amount').Value;
       const mpesaCode = body.Item.find(obj => obj.Name === 'MpesaReceiptNumber').Value;
       const phone = body.Item.find(obj => obj.Name === 'PhoneNumber').Value;
+      const transactionDate = body.Item.find(obj => obj.Name === 'TransactionDate').Value;
+
+      // Store the Transactio/payment in mongodb
+
 
       console.log(`Transaction Successful: ${amount}, ${mpesaCode}, ${phone}`);
-      // (order) redis utility store: ie successful transaction CheckoutRequestID = { ResultCode: result_code, ResultDesc: "success" }
-      // (order) database utility store: mark the orderid matching the CheckoutRequestID as paid - yes and complete + add the transaction data
-      // (order) store the transaction details
+      await RedisClient.set(
+        checkoutRequestID,
+        JSON.stringify({ ResultCode: result_code, ResultDesc: "Success" }),
+        300
+      );
+
+      const order = await Order.findOneAndUpdate(
+        { checkoutRequestID: checkoutRequestID },
+        { 
+          paid: 'Yes',
+          'payment.amount': amount,
+          'payment.mpesaCode': mpesaCode,
+          'payment.phone': phone,
+          'payment.transactionDate': transactionDate
+        },
+        { new: true }
+      );
+
       return res.json({ ResultCode: 0, ResultDesc: "Success" });
 
 
@@ -30,9 +56,46 @@ class MpesaCallbackController {
     }
   }
   static async OrderStatus(req, res) {
-    // (Order) Checks the status of the payment
-    // (Order) redis utility fetch: get the transaction status using the CheckoutRequestID (only if the transaction succeeds, use ResultDesc)
-    // remove the checkoutrequesid from redis
+    const { checkoutRequestID } = req.params;
+    try {
+      const status = await RedisClient.get(checkoutRequestID);
+      if (!status) {
+        return res.status(404).json({ message: 'Order status not found or expired.' });
+      }
+
+      const statusData = JSON.parse(status);
+      if (statusData.ResultCode !== 0) {
+        return res.status(200).json({ status: 'failed', description: statusData.ResultDesc });
+      }
+
+      const order = await Order.findOne({ checkoutRequestID: checkoutRequestID });
+      if (!order) {
+        return res.status(404).json({ message: 'Order not found.' });
+      }
+
+      await RedisClient.del(checkoutRequestID);
+
+      return res.status(200).json({
+        status: 'success',
+        order: {
+          orderID: order._id,
+          drink: order.drink,
+          quantity: order.quantity,
+          total: order.total,
+          branch: order.branch,
+          paid: order.paid,
+        },
+        transaction: {
+          amount: order.payment.amount,
+          mpesaCode: order.payment.mpesaCode,
+          transactionDate: order.payment.transactionDate,
+          phone: order.payment.phone,
+        }
+      });
+    } catch (error) {
+      console.error(`Order status error: ${error}`);
+      return res.status(500).json({ message: 'Internal server error.' });
+    }
   }
 }
 
