@@ -11,7 +11,7 @@ router.post("/mpesa-express-callback", MPesaCallcackController.MpesaCallback);
 router.get("/order-status/:checkoutRequestID", MPesaCallcackController.OrderStatus);
 router.post("/cashorder", CashOrderController.CashOrderCustomer);
 router.post("/restock", RestockController.restockItem); // New restock route
-router.post("/register", AuthController.register);
+router.post("/signup", AuthController.register);
 router.post("/login", AuthController.login);
 
 export default router;
