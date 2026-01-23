@@ -1,4 +1,4 @@
-import Stock from "../models/stock.model.js";
+import Stock from "../models/Stock.js";
 
 export const handleRestock = async (req, res) => {
   const { location, brand, quantity } = req.query;
@@ -27,8 +27,7 @@ export const handleRestock = async (req, res) => {
       },
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error updating stock", error: error.message });
+    console.log(`${error}`)
+    res.status(500).json({ message: "Error updating stock", error: error.message });
   }
 };

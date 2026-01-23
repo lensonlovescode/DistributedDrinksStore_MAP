@@ -5,13 +5,13 @@ import Stock from '../models/Stock.js';
 import DBClient from '../services/db.js'; // Import DBClient
 
 const products = [
-  { name: 'Coca-Cola', description: 'Classic Coca-Cola', price: 50 },
+  { name: 'Coke', description: 'Classic Coca-Cola', price: 50 },
   { name: 'Fanta', description: 'Fruity Fanta', price: 50 },
   { name: 'Sprite', description: 'Refreshing Sprite', price: 50 }
 ];
 
 const branches = [
-  { name: 'Nairobi', isHQ: true },
+  { name: 'Nairobi(HQ)', isHQ: true },
   { name: 'Mombasa' },
   { name: 'Eldoret' },
   { name: 'Kisumu' },
