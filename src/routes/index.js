@@ -2,16 +2,20 @@ import express from "express";
 import MpesaController from "../controllers/MPesaController.js";
 import MPesaCallcackController from "../controllers/MPesaCallbackController.js";
 import CashOrderController from "../controllers/CashOrderController.js";
-import RestockController from "../controllers/RestockController.js"; // Import RestockController
-import AuthController from "../controllers/AuthController.js"; // Import AuthController
+import { getSalesSummary } from "../controllers/GetReport.js";
+import { getSodaDetails } from "../controllers/GetReportDrink.js";
+import { handleRestock } from "../controllers/Restock.js";
 const router = express.Router();
 
 router.post("/mpesapush", MpesaController.MpesaMainPush);
 router.post("/mpesa-express-callback", MPesaCallcackController.MpesaCallback);
-router.get("/order-status/:checkoutRequestID", MPesaCallcackController.OrderStatus);
+router.get(
+  "/order-status/:checkoutRequestID",
+  MPesaCallcackController.OrderStatus,
+);
 router.post("/cashorder", CashOrderController.CashOrderCustomer);
-router.post("/restock", RestockController.restockItem); // New restock route
-router.post("/signup", AuthController.register);
-router.post("/login", AuthController.login);
+router.post("/restock", handleRestock);
+router.get("/sales-summary", getSalesSummary);
+router.get("/soda-info", getSodaDetails);
 
 export default router;
