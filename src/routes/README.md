@@ -179,3 +179,173 @@ Creates a new cash order.
     "error": "some_error_message"
   }
   ```
+
+---
+
+### 5. Restock Items
+
+Adds stock to a specific product at a specific branch.
+
+- **URL:** `/restock`
+- **Method:** `POST`
+- **Request Body:**
+  ```json
+  {
+    "branch": "Nairobi",
+    "drink": "Coca-Cola",
+    "quantity": 50
+  }
+  ```
+- **Success Response:**
+  - **Code:** `200 OK`
+  ```json
+  {
+    "message": "Stock updated successfully",
+    "branch": "Nairobi",
+    "drink": "Coca-Cola",
+    "newQuantity": 150 // Example: if initial was 100 and 50 were added
+  }
+  ```
+- **Error Response:**
+  - **Code:** `400 Bad Request`
+  ```json
+  {
+    "message": "Missing required fields: branch, drink, quantity"
+  }
+  ```
+  - **Code:** `400 Bad Request`
+  ```json
+  {
+    "message": "Quantity must be a positive number."
+  }
+  ```
+  - **Code:** `400 Bad Request`
+  ```json
+  {
+    "message": "Branch not found: SomeBranch"
+  }
+  ```
+  - **Code:** `400 Bad Request`
+  ```json
+  {
+    "message": "Product not found: SomeProduct"
+  }
+  ```
+  - **Code:** `400 Bad Request`
+  ```json
+  {
+    "message": "Stock entry not found for SomeProduct at SomeBranch. Please create it first."
+  }
+  ```
+
+---
+
+### 6. Register User
+
+Registers a new user (customer or admin).
+
+- **URL:** `/register`
+- **Method:** `POST`
+- **Request Body:**
+  ```json
+  {
+    "name": "John Doe",
+    "username": "johndoe",
+    "email": "john.doe@example.com",
+    "password": "securepassword123",
+    "role": "customer" // Optional, defaults to "customer". Can be "admin".
+  }
+  ```
+- **Success Response:**
+  - **Code:** `201 Created`
+  ```json
+  {
+    "message": "User registered successfully",
+    "user": {
+      "id": "60d... (mongodb_id)",
+      "name": "John Doe",
+      "username": "johndoe",
+      "email": "john.doe@example.com",
+      "role": "customer"
+    }
+  }
+  ```
+- **Error Response:**
+  - **Code:** `400 Bad Request`
+  ```json
+  {
+    "message": "Name, username, email and password are required"
+  }
+  ```
+  - **Code:** `409 Conflict`
+  ```json
+  {
+    "message": "User already exists with that email"
+  }
+  ```
+  - **Code:** `409 Conflict`
+  ```json
+  {
+    "message": "User already exists with that username"
+  }
+  ```
+  - **Code:** `500 Internal Server Error`
+  ```json
+  {
+    "message": "Internal Server Error",
+    "error": "some_error_message"
+  }
+  ```
+
+---
+
+### 7. Login User
+
+Logs in an existing user and returns a JWT token.
+
+- **URL:** `/login`
+- **Method:** `POST`
+- **Request Body:**
+  ```json
+  {
+    "email": "john.doe@example.com",
+    "password": "securepassword123"
+  }
+  ```
+- **Success Response:**
+  - **Code:** `200 OK`
+  ```json
+  {
+    "message": "Login successful",
+    "token": "eyJhbGciOiJIUzI1Ni...", // JWT token
+    "user": {
+      "id": "60d... (mongodb_id)",
+      "name": "John Doe",
+      "username": "johndoe",
+      "email": "john.doe@example.com",
+      "role": "customer"
+    }
+  }
+  ```
+- **Error Response:**
+  - **Code:** `400 Bad Request`
+  ```json
+  {
+    "message": "Email and password are required"
+  }
+  ```
+  - **Code:** `401 Unauthorized`
+  ```json
+  {
+    "message": "Invalid email or password"
+  }
+  ```
+  - **Code:** `500 Internal Server Error`
+  ```json
+  {
+    "message": "Internal Server Error",
+    "error": "some_error_message"
+  }
+  ```
+
+
